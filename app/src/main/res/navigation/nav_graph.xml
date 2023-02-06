@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/fragmentCategory">
+
+    <fragment
+        android:id="@+id/fragmentCategory"
+        android:name="com.example.testpixabay.category.FragmentCategory"
+        android:label="fragment_category"
+        tools:layout="@layout/fragment_category" >
+        <action
+            android:id="@+id/action_fragmentCategory_to_fragmentImageList"
+            app:destination="@id/fragmentImageList"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentImageList"
+        android:name="com.example.testpixabay.imagelist.FragmentImageList"
+        android:label="fragment_image_list"
+        tools:layout="@layout/fragment_image_list" >
+        <action
+            android:id="@+id/action_fragmentImageList_to_fragmentWallpaper"
+            app:destination="@id/fragmentWallpaper"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+        <argument
+            android:name="category"
+            app:argType="com.example.testpixabay.data.CategoryImage"
+            android:defaultValue="NATURE"/>
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentWallpaper"
+        android:name="com.example.testpixabay.wallpaper.FragmentWallpaper"
+        android:label="fragment_wallpaper"
+        tools:layout="@layout/fragment_wallpaper">
+        <argument
+            android:name="imageURL"
+            app:argType="string"
+            />
+    </fragment>
+</navigation>

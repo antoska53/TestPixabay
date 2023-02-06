@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Test Pixabay</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="button_wallpaper_text">Установить как обои</string>
+    <string name="category_image">Категории картинок</string>
+    <string name="error_load">Ошибка загрузки</string>
+    <string name="reload">Повторить</string>
+    <string name="message_wallpaper_success">Обои установлены</string>
+    <string name="message_wallpaper_error">Не удалось установить обои</string>
+</resources>
