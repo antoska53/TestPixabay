@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="color_app">#191926</color>
     <color name="pink_button">#FF3466</color>
+    <color name="ic_launcher_background">#191926</color>
 </resources>
