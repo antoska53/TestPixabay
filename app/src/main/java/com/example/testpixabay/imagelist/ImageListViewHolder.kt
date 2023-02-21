@@ -11,15 +11,15 @@ import com.example.testpixabay.network.Image
 class ImageListViewHolder(private val binding: ViewHolderImageListBinding) :
     ViewHolder(binding.root) {
 
-    fun onBind(image: Image) {
+    fun onBind(image: Image?) {
         binding.ivImageList.setOnClickListener {
-            val bundle = bundleOf("image" to image.largeImageURL)
+            val bundle = bundleOf("image" to image?.largeImageURL)
             binding.root.findNavController()
                 .navigate(R.id.action_fragmentImageList_to_fragmentWallpaper, bundle)
         }
 
         Glide.with(binding.root)
-            .load(image.previewURL)
+            .load(image?.previewURL)
             .into(binding.ivImageList)
     }
 }

@@ -5,6 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Image(
+    @SerialName("id")
+    val id: Long,
+
     @SerialName("previewURL")
     val previewURL: String,
 
