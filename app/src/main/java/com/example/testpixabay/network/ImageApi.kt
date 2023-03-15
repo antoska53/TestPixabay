@@ -16,6 +16,6 @@ interface ImageApi {
         @Query("key") apiKey: String,
         @Query("category") category: String,
         @Query("page") page: Int,
-        @Query("pre_page") prePage: Int
+        @Query("per_page") perPage: Int
     ): ImageResponse
 }

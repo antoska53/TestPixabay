@@ -4,47 +4,19 @@ import androidx.lifecycle.*
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.example.testpixabay.BuildConfig
 import com.example.testpixabay.network.*
-import kotlinx.coroutines.launch
 
 class ImageListViewModel(private val category: String) : ViewModel() {
 
-    private val mutableLiveData = MutableLiveData<LoadResult>()
-    val liveData: LiveData<LoadResult> = mutableLiveData
-    private val _loadState = MutableLiveData<LoadState>()
-    val loadState = _loadState
-    private val imageApi = RetrofitModule.imageApi
     val flow = Pager(
         // Configure how data is loaded by passing additional properties to
         // PagingConfig, such as prefetchDistance.
-        PagingConfig(pageSize = 100)
+        PagingConfig(pageSize = NETWORK_PAGE_SIZE, initialLoadSize = NETWORK_INITIAL_PAGE_SIZE, enablePlaceholders = false)
     ) {
         ImagePagingSource(category)
     }.flow
         .cachedIn(viewModelScope)
 
-    init {
-//        loadData()
-    }
-
-    fun loadData() {
-        viewModelScope.launch {
-            _loadState.value = Loading()
-            mutableLiveData.value =
-                try {
-                    val listImages = loadImage()
-                    SuccessResult(listImages)
-                } catch (e: Throwable) {
-                    ErrorResult(e)
-                }
-            _loadState.value = Ending()
-        }
-    }
-
-    private suspend fun loadImage(): List<Image> {
-        return imageApi.getImages(BuildConfig.API_KEY, category).images
-    }
 
     class Factory(val category: String) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -54,5 +26,10 @@ class ImageListViewModel(private val category: String) : ViewModel() {
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
+    }
+
+    companion object {
+        const val NETWORK_PAGE_SIZE = 50
+        const val NETWORK_INITIAL_PAGE_SIZE = 100
     }
 }

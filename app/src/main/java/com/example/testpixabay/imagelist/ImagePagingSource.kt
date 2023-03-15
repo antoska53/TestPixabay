@@ -1,5 +1,6 @@
 package com.example.testpixabay.imagelist
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.testpixabay.BuildConfig
@@ -27,17 +28,16 @@ class ImagePagingSource(val category: String) : PagingSource<Int, Image>() {
         try {
             // Start refresh at page 1 if undefined.
             val nextPageNumber = params.key ?: 1
-//            val response = backend.searchUsers(query, nextPageNumber)
             val response = RetrofitModule.imageApi.getImagesPaging(
                 BuildConfig.API_KEY,
                 category,
                 nextPageNumber,
-                100
+                params.loadSize
             )
             return LoadResult.Page(
                 data = response.images,
-                prevKey = null, // Only paging forward.
-                nextKey = if (response.total / 100 > nextPageNumber.plus(1)) nextPageNumber.plus(1) else null
+                prevKey = if (nextPageNumber == 1) null else nextPageNumber - 1, // Only paging forward.
+                nextKey = if (response.images.size < params.loadSize) null else nextPageNumber.plus(1)
             )
         } catch (e: IOException) {
             // IOException for network failures.

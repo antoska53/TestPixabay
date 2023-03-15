@@ -27,7 +27,6 @@ class FragmentWallpaper : Fragment() {
         arguments?.getString("image")
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
