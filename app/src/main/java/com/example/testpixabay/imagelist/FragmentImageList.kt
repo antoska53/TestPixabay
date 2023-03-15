@@ -8,12 +8,17 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
 import com.example.testpixabay.data.CategoryImage
 import com.example.testpixabay.databinding.FragmentImageListBinding
-import com.example.testpixabay.network.*
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 class FragmentImageList : Fragment() {
@@ -47,64 +52,45 @@ class FragmentImageList : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.tvCategory.text = categoryImage.categoryRu
+        val pagingAdapter = ImageListPagingAdapter(ImageListPagingAdapter.ImageComparator)
+        binding.recyclerImage.adapter = pagingAdapter.withLoadStateHeaderAndFooter(
+            header = ImageListLoadStateAdapter{ pagingAdapter.retry() },
+            footer = ImageListLoadStateAdapter{ pagingAdapter.retry() }
+        )
+
         initRecycler()
-        binding.errorView.buttonReload.setOnClickListener {
-            viewModel.loadData()
-        }
 
-        viewModel.liveData.observe(viewLifecycleOwner) { loadResult ->
-            when (loadResult) {
-                is SuccessResult -> {
-                    showResult()
-                    updateRecycler(loadResult.listImages)
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                pagingAdapter.loadStateFlow.collect {loadStates ->
+                    binding.progressBar.isVisible =
+                        loadStates.refresh is LoadState.Loading
+                    binding.recyclerImage.isVisible =
+                        loadStates.refresh is LoadState.NotLoading
+                    binding.errorView.root.isVisible =
+                        loadStates.refresh is LoadState.Error
                 }
-                is ErrorResult -> showError()
             }
         }
 
-        viewModel.loadState.observe(viewLifecycleOwner) { loadState ->
-            when (loadState) {
-                is Loading -> showLoad()
-                is Ending -> hideLoad()
+        lifecycleScope.launch {
+            viewModel.flow.collectLatest { pagingData ->
+                pagingAdapter.submitData(pagingData)
             }
         }
 
+        binding.errorView.buttonReload.setOnClickListener {
+            pagingAdapter.retry()
+        }
     }
 
     private fun initRecycler() {
-        binding.recyclerImage.adapter = ImageListAdapter()
         val layoutManager = FlexboxLayoutManager(context)
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.justifyContent = JustifyContent.CENTER
         binding.recyclerImage.layoutManager = layoutManager
     }
 
-    private fun updateRecycler(listImage: List<Image>) {
-        (binding.recyclerImage.adapter as ImageListAdapter).addImages(listImage)
-    }
-
-    private fun showError() {
-        binding.errorView.root.isVisible = true
-        binding.recyclerImage.isVisible = false
-    }
-
-    private fun hideError() {
-        binding.errorView.root.isVisible = false
-    }
-
-    private fun showLoad() {
-        hideError()
-        binding.progressBar.isVisible = true
-        binding.recyclerImage.isVisible = false
-    }
-
-    private fun hideLoad() {
-        binding.progressBar.isVisible = false
-    }
-
-    private fun showResult() {
-        binding.recyclerImage.isVisible = true
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
